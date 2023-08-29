@@ -28,8 +28,8 @@ class Genre(models.Model):
 
 
 class Actor(models.Model):
-    first_name = models.CharField(max_length=125, required=True)
-    last_name = models.CharField(max_length=125, required=True)
+    first_name = models.CharField(max_length=125)
+    last_name = models.CharField(max_length=125)
 
     @property
     def full_name(self) -> str:
@@ -43,7 +43,7 @@ class Actor(models.Model):
 
 
 class Play(models.Model):
-    title = models.CharField(max_length=125, required=True)
+    title = models.CharField(max_length=125)
     description = models.TextField()
     genres = models.ManyToManyField(Genre, blank=True, related_name="plays")
     actors = models.ManyToManyField(Actor, blank=True, related_name="plays")
