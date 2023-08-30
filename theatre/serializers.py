@@ -39,6 +39,20 @@ class PlaySerializer(serializers.ModelSerializer):
         )
 
 
+class PlayListSerializer(PlaySerializer):
+    genres = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="name"
+    )
+    actors = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="full_name"
+    )
+
+
+class PlayDetailSerializer(PlaySerializer):
+    genres = GenreSerializer(many=True, read_only=True)
+    actors = ActorSerializer(many=True, read_only=True)
+
+
 class PerformanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Performance
