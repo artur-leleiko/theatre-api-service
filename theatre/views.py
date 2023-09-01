@@ -1,6 +1,13 @@
 from rest_framework import viewsets
 
-from theatre.models import TheatreHall, Genre, Actor, Play, Performance
+from theatre.models import (
+    TheatreHall,
+    Genre,
+    Actor,
+    Play,
+    Performance,
+    Reservation
+)
 from theatre.serializers import (
     TheatreHallSerializer,
     GenreSerializer,
@@ -10,7 +17,9 @@ from theatre.serializers import (
     PlayListSerializer,
     PlayDetailSerializer,
     PerformanceListSerializer,
-    PerformanceDetailSerializer
+    PerformanceDetailSerializer,
+    ReservationSerializer,
+    ReservationListSerializer
 )
 
 
@@ -55,3 +64,16 @@ class PerformanceViewSet(viewsets.ModelViewSet):
             return PerformanceDetailSerializer
 
         return PerformanceSerializer
+
+
+class ReservationViewSet(viewsets.ModelViewSet):
+    queryset = Reservation.objects.prefetch_related(
+        "tickets__performance__play", "tickets__performance__theatre_hall"
+    )
+    serializer_class = ReservationSerializer
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ReservationListSerializer
+
+        return ReservationSerializer
