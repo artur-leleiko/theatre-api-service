@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -69,3 +70,36 @@ class Performance(models.Model):
 
     class Meta:
         ordering = ["-show_time"]
+
+
+class Reservation(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+
+    def __str__(self) -> str:
+        return str(self.created_at)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
+class Ticket(models.Model):
+    row = models.IntegerField()
+    seat = models.IntegerField()
+    performance = models.ForeignKey(
+        Performance, on_delete=models.CASCADE, related_name="tickets"
+    )
+    reservation = models.ForeignKey(
+        Reservation, on_delete=models.CASCADE, related_name="tickets"
+    )
+
+    def __str__(self) -> str:
+        return (
+            f"{str(self.performance)} (row: {self.row}, seat: {self.seat})"
+        )
+
+    class Meta:
+        unique_together = ("performance", "row", "seat")
+        ordering = ["row", "seat"]
