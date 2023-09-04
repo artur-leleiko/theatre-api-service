@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db.models import QuerySet
+from django.db.models import QuerySet, F, Count
 from rest_framework import viewsets
 
 from theatre.models import (
@@ -82,7 +82,16 @@ class PlayViewSet(viewsets.ModelViewSet):
 
 
 class PerformanceViewSet(viewsets.ModelViewSet):
-    queryset = Performance.objects.select_related("play", "theatre_hall")
+    queryset = (
+        Performance.objects.all()
+        .select_related("play", "theatre_hall")
+        .annotate(
+            tickets_available=(
+                F("theatre_hall__rows") * F("theatre_hall__seats_in_row")
+                - Count("tickets")
+            )
+        )
+    )
     serializer_class = PerformanceSerializer
 
     def get_serializer_class(self):
