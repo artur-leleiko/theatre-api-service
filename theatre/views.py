@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from django.db.models import QuerySet, F, Count
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import GenericViewSet
 
 from theatre.models import (
     TheatreHall,
@@ -28,22 +29,39 @@ from theatre.serializers import (
 )
 
 
-class TheatreHallViewSet(viewsets.ModelViewSet):
+class TheatreHallViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet
+):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet
+):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
 
-class ActorViewSet(viewsets.ModelViewSet):
+class ActorViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet
+):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
 
 
-class PlayViewSet(viewsets.ModelViewSet):
+class PlayViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    GenericViewSet
+):
     queryset = Play.objects.prefetch_related("genres", "actors")
     serializer_class = PlaySerializer
 
@@ -126,7 +144,11 @@ class ReservationPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class ReservationViewSet(viewsets.ModelViewSet):
+class ReservationViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet
+):
     queryset = Reservation.objects.prefetch_related(
         "tickets__performance__play", "tickets__performance__theatre_hall"
     )
