@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db.models import QuerySet, F, Count
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 
 from theatre.models import (
     TheatreHall,
@@ -131,6 +132,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
     )
     serializer_class = ReservationSerializer
     pagination_class = ReservationPagination
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self) -> QuerySet:
         return Reservation.objects.filter(user=self.request.user)
