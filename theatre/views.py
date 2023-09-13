@@ -1,9 +1,11 @@
 from datetime import datetime
 
 from django.db.models import QuerySet, F, Count
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from theatre.models import (
@@ -25,7 +27,8 @@ from theatre.serializers import (
     PerformanceListSerializer,
     PerformanceDetailSerializer,
     ReservationSerializer,
-    ReservationListSerializer
+    ReservationListSerializer,
+    PlayImageSerializer
 )
 
 
@@ -65,15 +68,6 @@ class PlayViewSet(
     queryset = Play.objects.prefetch_related("genres", "actors")
     serializer_class = PlaySerializer
 
-    def get_serializer_class(self):
-        if self.action == "list":
-            return PlayListSerializer
-
-        if self.action == "retrieve":
-            return PlayDetailSerializer
-
-        return PlaySerializer
-
     @staticmethod
     def _params_to_ints(qs: list[str]) -> list[int]:
         """Converts a list of string IDs to a list of integers"""
@@ -99,6 +93,33 @@ class PlayViewSet(
             queryset = queryset.filter(actors__id__in=actors_ids)
 
         return queryset.distinct()
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return PlayListSerializer
+
+        if self.action == "retrieve":
+            return PlayDetailSerializer
+
+        if self.action == "upload_image":
+            return PlayImageSerializer
+
+        return PlaySerializer
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+        permission_classes=[IsAdminUser]
+    )
+    def upload_image(self, request, pk=None) -> Response:
+        """Endpoint for uploading image to specific play."""
+        play = self.get_object()
+        serializer = self.get_serializer(play, data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class PerformanceViewSet(viewsets.ModelViewSet):
