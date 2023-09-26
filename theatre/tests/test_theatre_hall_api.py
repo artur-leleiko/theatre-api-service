@@ -51,7 +51,6 @@ class AuthenticatedTheatreHallApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
-
     def test_create_theatre_hall_forbidden(self):
         payload = {"name": "Test", "rows": 15, "seats_in_row": 15}
         res = self.client.post(THEATRE_HALL_URL, payload)
