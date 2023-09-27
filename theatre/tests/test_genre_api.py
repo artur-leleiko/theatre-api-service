@@ -10,13 +10,6 @@ from theatre.serializers import GenreSerializer
 GENRE_URL = reverse("theatre:genre-list")
 
 
-def sample_genre(**params):
-    defaults = {"name": "Genre"}
-    defaults.update(**params)
-
-    return Genre.objects.create(**defaults)
-
-
 class UnAuthenticatedGenreApiTests(TestCase):
     def setUp(self) -> None:
         self.client = APIClient()
@@ -36,8 +29,8 @@ class AuthenticatedGenreApiTests(TestCase):
         self.client.force_authenticate(self.user)
 
     def test_list_genres(self):
-        sample_genre(name="Test1")
-        sample_genre(name="Test2")
+        Genre.objects.create(name="Test1")
+        Genre.objects.create(name="Test2")
 
         res = self.client.get(GENRE_URL)
 
