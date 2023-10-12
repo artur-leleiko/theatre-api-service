@@ -79,7 +79,7 @@ class Performance(models.Model):
     show_time = models.DateTimeField()
 
     def __str__(self) -> str:
-        return self.play.title + " " + str(self.show_time)
+        return f"{self.play.title} {str(self.show_time)}"
 
     class Meta:
         ordering = ["-show_time"]
